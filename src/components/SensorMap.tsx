@@ -5,7 +5,6 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import type { LatLngTuple } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { QRCodeSVG } from 'qrcode.react';
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
 import { Sensor, ARModalProps } from '@/types/sensor';
@@ -36,9 +35,10 @@ const Navbar: React.FC = () => {
   );
 };
 
-const ARModal: React.FC<ARModalProps> = ({ isOpen, onClose, sensorId, sensorName }) => {
-  const arAppURL = `farmvision://sensor/${sensorId}`;
-
+// Update the ARModal component definition
+const ARModal: React.FC<ARModalProps> = ({ isOpen, onClose, sensorName }) => {
+  const [showVideo, setShowVideo] = useState(false);
+  
   return (
     <DialogPrimitive.Root open={isOpen} onOpenChange={onClose}>
       <DialogPrimitive.Portal>
@@ -50,49 +50,62 @@ const ARModal: React.FC<ARModalProps> = ({ isOpen, onClose, sensorId, sensorName
           <DialogPrimitive.Title className="text-xl font-semibold text-slate-900 mt-2">
             View Sensor {sensorName}
           </DialogPrimitive.Title>
-          <DialogPrimitive.Description className="text-sm text-slate-600 mt-1">
-            Scan this QR code with your mobile device to view the sensor in augmented reality.
-          </DialogPrimitive.Description>
-          <div className="mt-6 space-y-6">
-            <div className="flex justify-center bg-slate-50 rounded-lg p-4">
-              <QRCodeSVG 
-                value={arAppURL} 
-                size={256}
-                level="H"
-                includeMargin
-              />
-            </div>
-            <div className="space-y-3 bg-blue-50 rounded-lg p-4">
-              <h4 className="font-medium text-blue-900 flex items-center gap-2">
-                <Radio className="w-4 h-4" />
-                New to FarmVision AR?
-              </h4>
-              <ol className="list-decimal ml-4 text-sm text-blue-800 space-y-2">
-                <li>Download FarmVision AR from your device&apos;s app store</li>
-                <li>Open the app and sign in with your farm credentials</li>
-                <li>Scan this QR code or tap the button below</li>
-                <li>Point your device at the sensor location</li>
-              </ol>
-            </div>
-            <div className="flex justify-between gap-3 pt-2">
-              <Button 
-                variant="outline" 
-                onClick={onClose}
-                className="flex-1"
+          
+          {!showVideo ? (
+            <>
+              <DialogPrimitive.Description className="text-sm text-slate-600 mt-1">
+                Click below to see how this sensor works in augmented reality.
+              </DialogPrimitive.Description>
+              <div className="mt-6 space-y-6">
+                <div className="space-y-3 bg-blue-50 rounded-lg p-4">
+                  <h4 className="font-medium text-blue-900 flex items-center gap-2">
+                    <Radio className="w-4 h-4" />
+                    FarmVision AR Demo
+                  </h4>
+                  <p className="text-sm text-blue-800">
+                    Watch a demonstration of how FarmVision AR helps you monitor and interact with sensors in the field.
+                  </p>
+                </div>
+                <div className="flex justify-between gap-3 pt-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={onClose}
+                    className="flex-1"
+                  >
+                    Close
+                  </Button>
+                  <Button 
+                    onClick={() => setShowVideo(true)}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700"
+                  >
+                    Watch Demo
+                  </Button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="mt-4">
+              <video 
+                className="w-full rounded-lg"
+                controls
+                autoPlay
+                src="/IMG_0046.mov"
               >
-                Close
-              </Button>
-              <Button 
-                onClick={() => {
-                  console.log("Opening AR app with URL:", arAppURL); // Debugging log
-                  window.location.href = arAppURL;
-                }}
-                className="flex-1 bg-blue-600 hover:bg-blue-700"
-              >
-                Open in AR App
-              </Button>
+                Your browser does not support the video tag.
+              </video>
+              <div className="mt-4 flex justify-end">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setShowVideo(false);
+                    onClose();
+                  }}
+                >
+                  Close
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
