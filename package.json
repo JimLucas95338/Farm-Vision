@@ -24,6 +24,7 @@
     "react-leaflet": "^5.0.0",
     "tailwind-merge": "^2.6.0"
   },
+  
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@shadcn/ui": "^0.0.4",
